@@ -1,0 +1,123 @@
+===Increase the fields limit===
+
+PUT my_index/_settings
+{
+  "index.mapping.total_fields.limit": 2000
+}
+
+
+===delete an index===
+DELETE /twitter or
+curl -XDELETE localhost:9200/listings
+
+
+===Find index statistics(ex. size)===
+
+GET /_stats
+
+
+===Create an index with mapping===
+
+PUT listings
+{
+    "settings" : {
+        "number_of_shards" : 1
+    },
+    "mappings" : {
+        "properties" : {
+            "field1" : { "type" : "text" }
+        }
+    }
+}
+
+===get index===
+
+GET /listings
+
+===check if index exists or not===
+
+HEAD listings
+
+===check if certain fields exist or not===
+
+GET _search
+{
+  "query": {
+    "bool": {
+      "must": {
+          "exists": {
+              "field": "listingFreeTextDetails_Agent_Name"
+          }
+      }
+    }
+  }
+}
+
+
+===update mapping===
+
+PUT listings/_mapping 
+{
+  "properties": {
+    "email": {
+      "type": "keyword"
+    }
+  }
+}
+
+===get mapping===
+
+GET /listings/_mapping
+
+===update settings===
+
+PUT /listings/_settings
+{
+    "index" : {
+        "number_of_replicas" : 2
+    }
+}
+
+===update analyzer===
+
+
+PUT /twitter/_settings
+{
+  "analysis" : {
+    "analyzer":{
+      "content":{
+        "type":"custom",
+        "tokenizer":"whitespace"
+      }
+    }
+  }
+  
+  
+===analyze===
+ 
+ GET _analyze
+{
+  "tokenizer" : "keyword",
+  "filter" : ["lowercase"],
+  "text" : "this is a test"
+}
+
+
+===search===
+
+GET /_search
+{
+  "query": { 
+    "bool": { 
+      "must": [
+        { "match": { "field1": "xxx"        }}, 
+        { "match": { "field2": "xxx" }},
+        { "wildcard" : { "user" : { "value" : "ki*y", "boost" : 2.0 } }}
+      ],
+      "filter": [ 
+        { "term":  { "status": "published" }}, 
+        { "range": { "publish_date": { "gte": "2015-01-01" }}} 
+      ]
+    }
+  }
+}
